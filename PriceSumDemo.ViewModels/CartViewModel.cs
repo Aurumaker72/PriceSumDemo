@@ -1,38 +1,55 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
-namespace PriceSumDemo.ViewModels
+namespace PriceSumDemo.ViewModels;
+
+public partial class CartViewModel : ObservableObject
 {
-    public partial class CartViewModel : ObservableObject
+    public CartViewModel()
     {
-        public ObservableCollection<CartItemViewModel> CartItems { get; } = new();
-        public int PriceSum { get; private set; }
-
-        public CartViewModel()
+        CartItems.CollectionChanged += (_, _) =>
         {
-            CartItems.CollectionChanged += (o, e) =>
-            {
-                PriceSum = CartItems.Sum(x => x.Price);
-                OnPropertyChanged(nameof(PriceSum));
-            };
+            PriceSum = CartItems.Sum(x => x.Price);
+            OnPropertyChanged(nameof(PriceSum));
+        };
 
-            CartItems.Add(new CartItemViewModel
-            {
-                Name = "Burger",
-                Price = 399
-            });
-            CartItems.Add(new CartItemViewModel
-            {
-                Name = "Pizza",
-                Price = 899
-            });
+        CartItems.Add(new CartItemViewModel
+        {
+            Name = "Burger",
+            Price = 399
+        });
+        CartItems.Add(new CartItemViewModel
+        {
+            Name = "Pizza",
+            Price = 899
+        });
+    }
 
-            
-        }
+    public ObservableCollection<CartItemViewModel> CartItems { get; } = new();
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PriceSum))]
+    [NotifyCanExecuteChangedFor(nameof(RemoveSelectedCartItemCommand))]
+    private CartItemViewModel? _selectedCartItem;
+
+    public int PriceSum { get; private set; }
+
+    public bool IsCartItemSelected => SelectedCartItem != null;
+
+    [RelayCommand]
+    private void AddRandomItem()
+    {
+        CartItems.Add(new CartItemViewModel
+        {
+            Name = Random.Shared.NextInt64().ToString(),
+            Price = Random.Shared.Next(399, 5999)
+        });
+    }
+
+    [RelayCommand(CanExecute = nameof(IsCartItemSelected))]
+    private void RemoveSelectedCartItem()
+    {
+        CartItems.Remove(SelectedCartItem!);
     }
 }
