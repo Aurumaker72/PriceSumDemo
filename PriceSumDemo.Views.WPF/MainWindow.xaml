@@ -1,0 +1,27 @@
+﻿<Window x:Class="PriceSumDemo.Views.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PriceSumDemo.Views.WPF"
+        xmlns:viewmodels="clr-namespace:PriceSumDemo.ViewModels;assembly=PriceSumDemo.ViewModels"
+        mc:Ignorable="d"
+        Title="MainWindow" 
+        Height="450" 
+        Width="800"
+        d:DataContext="{x:Type viewmodels:CartViewModel}">
+    <StackPanel Orientation="Vertical">
+        <ItemsControl ItemsSource="{Binding CartItems}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="viewmodels:CartItemViewModel">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="{Binding Price, Converter={StaticResource FixedPointPriceToDecimalPriceConverter}}"/>
+                        <Separator/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Text="{Binding PriceSum, Converter={StaticResource FixedPointPriceToDecimalPriceConverter}}"/>
+    </StackPanel>
+</Window>
